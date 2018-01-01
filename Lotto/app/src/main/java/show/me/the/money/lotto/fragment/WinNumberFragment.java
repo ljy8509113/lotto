@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import show.me.the.money.lotto.R;
 import show.me.the.money.lotto.data.DBManager;
+import show.me.the.money.lotto.data.DataNumber;
 import show.me.the.money.lotto.network.ConnectionListener;
 import show.me.the.money.lotto.network.ConnectionManager;
 import show.me.the.money.lotto.network.RequesterNumber;
@@ -39,9 +40,9 @@ public class WinNumberFragment extends android.support.v4.app.Fragment implement
         _adapter = new WinNumber(_arrayData);
         _listWinNumber.setAdapter(_adapter);
 
-        long rowCount = DBManager.Instance(getContext()).getRowCount();
-        if(rowCount > 0){
-
+        _lastNoCount = DBManager.Instance(getContext()).getTotalCount();
+        if(_lastNoCount > 0){
+           DataNumber data = DBManager.Instance(getContext()).getData(_lastNoCount);
         }else{
 
         }

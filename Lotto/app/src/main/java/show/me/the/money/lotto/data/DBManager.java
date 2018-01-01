@@ -31,6 +31,22 @@ public class DBManager {
         instance._helper = new DBContactHelper(context);
     }
 
+    public void insertData(DataNumber data ){
+        instance._helper.addNumberInfo(data);
+    }
+
+    public ArrayList<DataNumber> getAllData(){
+        return instance._helper.getAllData();
+    }
+
+    public DataNumber getData(int no){
+        return instance.getData(no);
+    }
+
+    public int getTotalCount(){
+        return instance._helper.getContactsCount();
+    }
+
     class DBContactHelper extends SQLiteOpenHelper {
         // All Static variables
 
@@ -50,11 +66,6 @@ public class DBManager {
         // Creating Tables
         @Override
         public void onCreate(SQLiteDatabase db) {
-//            String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_NAME + "("
-//                    + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT,"
-//                    + KEY_PH_NO + " TEXT" + ")";
-//            db.execSQL(CREATE_CONTACTS_TABLE);
-
             db.execSQL("CREATE TABLE "+TABLE_WIN+"(" +
                     KEY_NO+" INTEGER PRIMARY KEY AUTOINCREMENT," +
                     KEY_NUMBER+"0 INTEGER," +
@@ -95,75 +106,103 @@ public class DBManager {
         }
 
         // id 에 해당하는 Contact 객체 가져오기
-        public Contact getContact(int id) {
+        public DataNumber getNoInfo(int no) {
             SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.query(TABLE_CONTACTS, new String[] { KEY_ID,
-                            KEY_NAME, KEY_PH_NO }, KEY_ID + "=?",
-                    new String[] { String.valueOf(id) }, null, null, null, null);
+            String [] column = new String[7];
+            for(int i=0; i<column.length-1; i++){
+                column[i] = KEY_NUMBER+i;
+            }
+            column[6] = KEY_BONUS;
+            Cursor cursor = db.query(TABLE_WIN, column, KEY_NO + "=?", new String[] { String.valueOf(no) }, null, null, null, null);
             if (cursor != null)
                 cursor.moveToFirst();
 
-            Contact contact = new Contact(Integer.parseInt(cursor.getString(0)),
-                    cursor.getString(1), cursor.getString(2));
-            // return contact
-            return contact;
+            DataNumber data = new DataNumber();
+            data.setNumber(
+                    Integer.parseInt(cursor.getString(0)),
+                    Integer.parseInt(cursor.getString(1)),
+                    Integer.parseInt(cursor.getString(2)),
+                    Integer.parseInt(cursor.getString(3)),
+                    Integer.parseInt(cursor.getString(4)),
+                    Integer.parseInt(cursor.getString(5)),
+                    Integer.parseInt(cursor.getString(6)),
+                    Integer.parseInt(cursor.getString(7))
+                    );
+            return data;
         }
 
         // 모든 Contact 정보 가져오기
-        public List<contact> getAllContacts() {
-            List<contact> contactList = new ArrayList<contact>();
+        public ArrayList<DataNumber> getAllData() {
+            ArrayList<DataNumber> listData = new ArrayList<>();
             // Select All Query
-            String selectQuery = "SELECT  * FROM " + TABLE_CONTACTS;
+            String selectQuery = "SELECT  * FROM " + TABLE_WIN;
 
             SQLiteDatabase db = this.getWritableDatabase();
             Cursor cursor = db.rawQuery(selectQuery, null);
 
             // looping through all rows and adding to list
-            if (cursor.moveToFirst()) {
-                do {
-                    Contact contact = new Contact();
-                    contact.setID(Integer.parseInt(cursor.getString(0)));
-                    contact.setName(cursor.getString(1));
-                    contact.setPhoneNumber(cursor.getString(2));
-                    // Adding contact to list
-                    contactList.add(contact);
-                } while (cursor.moveToNext());
-            }
+//            if (cursor.moveToFirst()) {
+//                do {
+//                    Contact contact = new Contact();
+//                    contact.setID(Integer.parseInt(cursor.getString(0)));
+//                    contact.setName(cursor.getString(1));
+//                    contact.setPhoneNumber(cursor.getString(2));
+//                    // Adding contact to list
+//                    contactList.add(contact);
+//                } while (cursor.moveToNext());
+//            }
 
+            while (cursor.moveToNext()){
+                DataNumber data = new DataNumber();
+                data.setNumber(
+                        Integer.parseInt(cursor.getString(0)),
+                        Integer.parseInt(cursor.getString(1)),
+                        Integer.parseInt(cursor.getString(2)),
+                        Integer.parseInt(cursor.getString(3)),
+                        Integer.parseInt(cursor.getString(4)),
+                        Integer.parseInt(cursor.getString(5)),
+                        Integer.parseInt(cursor.getString(6)),
+                        Integer.parseInt(cursor.getString(7))
+                );
+                listData.add(data);
+            }
             // return contact list
-            return contactList;
+            return listData;
         }
 
         //Contact 정보 업데이트
-        public int updateContact(Contact contact) {
-            SQLiteDatabase db = this.getWritableDatabase();
-
-            ContentValues values = new ContentValues();
-            values.put(KEY_NAME, contact.getName());
-            values.put(KEY_PH_NO, contact.getPhoneNumber());
-
-            // updating row
-            return db.update(TABLE_CONTACTS, values, KEY_ID + " = ?",
-                    new String[] { String.valueOf(contact.getID()) });
-        }
-
-        // Contact 정보 삭제하기
-        public void deleteContact(Contact contact) {
-            SQLiteDatabase db = this.getWritableDatabase();
-            db.delete(TABLE_CONTACTS, KEY_ID + " = ?",
-                    new String[] { String.valueOf(contact.getID()) });
-            db.close();
-        }
+//        public int updateContact(DataNumber data) {
+//            SQLiteDatabase db = this.getWritableDatabase();
+//
+//            ContentValues values = new ContentValues();
+//            values.put(KEY_NAME, contact.getName());
+//            values.put(KEY_PH_NO, contact.getPhoneNumber());
+//
+//            // updating row
+//            return db.update(TABLE_CONTACTS, values, KEY_ID + " = ?",
+//                    new String[] { String.valueOf(contact.getID()) });
+//        }
+//
+//        // Contact 정보 삭제하기
+//        public void deleteContact(Contact contact) {
+//            SQLiteDatabase db = this.getWritableDatabase();
+//            db.delete(TABLE_CONTACTS, KEY_ID + " = ?",
+//                    new String[] { String.valueOf(contact.getID()) });
+//            db.close();
+//        }
 
         // Contact 정보 숫자
         public int getContactsCount() {
-            String countQuery = "SELECT  * FROM " + TABLE_CONTACTS;
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery(countQuery, null);
-            cursor.close();
+//            String countQuery = "SELECT  * FROM " + TABLE_WIN;
+//            SQLiteDatabase db = this.getReadableDatabase();
+//            Cursor cursor = db.rawQuery(countQuery, null);
+//
+//            return cursor.getCount();
 
-            // return count
-            return cursor.getCount();
+            SQLiteDatabase db = this.getReadableDatabase();
+            int numRows = (int) DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM "+KEY_NO, null);
+
+            return numRows;
         }
     }
 
