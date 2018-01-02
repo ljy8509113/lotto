@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     ViewPager viewPager;
     ListView _listNumber;
 
-    Fragment [] _arrayFragment = {new NumberFragment(), new WinNumberFragment()};
+    Fragment [] _arrayFragment = {new WinNumberFragment(), new NumberFragment()};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Initializing the TabLayout
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("번호"));
         tabLayout.addTab(tabLayout.newTab().setText("당첨번호"));
+        tabLayout.addTab(tabLayout.newTab().setText("번호"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         // Initializing ViewPager
@@ -52,10 +52,10 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("lee ", "page : " + position);
                 switch (position){
                     case 0 :
-
+                        ((WinNumberFragment)_arrayFragment[position]).onLoad();
                         break;
                     case 1:
-                        ((WinNumberFragment)_arrayFragment[position]).onLoad();
+
                         break;
                 }
 

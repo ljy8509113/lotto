@@ -18,7 +18,10 @@
             android:layout_weight="1"
             android:text="00"
             android:textSize="20sp"
-            android:textAlignment="center"/>
+            android:textAlignment="center"
+            android:textColor="#6799FF"
+            android:textStyle="bold"
+            />
 
         <View
             android:layout_width="1dp"
@@ -91,7 +94,8 @@
             android:layout_weight="1"
             android:text="00"
             android:textSize="20sp"
-            android:textAlignment="center"/>
+            android:textAlignment="center"
+            android:textColor="#2F9D27"/>
 
     </LinearLayout>
 

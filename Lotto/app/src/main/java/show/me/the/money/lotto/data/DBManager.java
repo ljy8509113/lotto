@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -28,19 +27,19 @@ public class DBManager {
     }
 
     public void init(Context context){
-        instance._helper = new DBContactHelper(context);
+        _helper = new DBContactHelper(context);
     }
 
     public void insertData(DataNumber data ){
-        instance._helper.addNumberInfo(data);
+        _helper.addNumberInfo(data);
     }
 
     public ArrayList<DataNumber> getAllData(){
-        return instance._helper.getAllData();
+        return _helper.getAllData();
     }
 
     public DataNumber getData(int no){
-        return instance.getData(no);
+        return _helper.getNoInfo(no);
     }
 
     public int getTotalCount(){
@@ -76,6 +75,7 @@ public class DBManager {
                     KEY_NUMBER+"5 INTEGER," +
                     KEY_BONUS+" INTEGER"+
                     ");");
+            Log.d("lee", "create table");
         }
 
         // Upgrading database
@@ -108,34 +108,38 @@ public class DBManager {
         // id 에 해당하는 Contact 객체 가져오기
         public DataNumber getNoInfo(int no) {
             SQLiteDatabase db = this.getReadableDatabase();
-            String [] column = new String[7];
-            for(int i=0; i<column.length-1; i++){
-                column[i] = KEY_NUMBER+i;
+            String [] column = new String[8];
+            column[0] = KEY_NO;
+            for(int i=1; i<column.length-1; i++){
+                column[i] = KEY_NUMBER+(i-1);
             }
-            column[6] = KEY_BONUS;
+            column[7] = KEY_BONUS;
             Cursor cursor = db.query(TABLE_WIN, column, KEY_NO + "=?", new String[] { String.valueOf(no) }, null, null, null, null);
-            if (cursor != null)
+            if (cursor != null) {
                 cursor.moveToFirst();
 
-            DataNumber data = new DataNumber();
-            data.setNumber(
-                    Integer.parseInt(cursor.getString(0)),
-                    Integer.parseInt(cursor.getString(1)),
-                    Integer.parseInt(cursor.getString(2)),
-                    Integer.parseInt(cursor.getString(3)),
-                    Integer.parseInt(cursor.getString(4)),
-                    Integer.parseInt(cursor.getString(5)),
-                    Integer.parseInt(cursor.getString(6)),
-                    Integer.parseInt(cursor.getString(7))
-                    );
-            return data;
+                DataNumber data = new DataNumber();
+                data.setNumber(
+                        Integer.parseInt(cursor.getString(0)),
+                        Integer.parseInt(cursor.getString(1)),
+                        Integer.parseInt(cursor.getString(2)),
+                        Integer.parseInt(cursor.getString(3)),
+                        Integer.parseInt(cursor.getString(4)),
+                        Integer.parseInt(cursor.getString(5)),
+                        Integer.parseInt(cursor.getString(6)),
+                        Integer.parseInt(cursor.getString(7))
+                );
+                return data;
+            }else{
+                return null;
+            }
         }
 
         // 모든 Contact 정보 가져오기
         public ArrayList<DataNumber> getAllData() {
             ArrayList<DataNumber> listData = new ArrayList<>();
             // Select All Query
-            String selectQuery = "SELECT  * FROM " + TABLE_WIN;
+            String selectQuery = "SELECT * FROM " + TABLE_WIN +" ORDER BY "+KEY_NO+" desc";
 
             SQLiteDatabase db = this.getWritableDatabase();
             Cursor cursor = db.rawQuery(selectQuery, null);
@@ -200,7 +204,7 @@ public class DBManager {
 //            return cursor.getCount();
 
             SQLiteDatabase db = this.getReadableDatabase();
-            int numRows = (int) DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM "+KEY_NO, null);
+            int numRows = (int) DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM "+TABLE_WIN, null);
 
             return numRows;
         }

@@ -5,12 +5,27 @@ package show.me.the.money.lotto.network;
  */
 
 public class ResponseNumber {
-//    {"bnusNo":7,"firstAccumamnt":0,"firstWinamnt":1344616613,"returnValue":"success","totSellamnt":46640423000,"drwtNo3":13,"drwtNo2":6,"drwtNo1":5,"drwtNo6":20,"drwtNo5":17,"drwtNo4":14,"drwNoDate":"2006-09-30","drwNo":200,"firstPrzwnerCo":8}
+//    {
+//        "bnusNo": 9,
+//            "firstAccumamnt": 18552649878,
+//            "firstWinamnt": 3092108313,
+//            "returnValue": "success",
+//            "totSellamnt": 79593923000,
+//            "drwtNo3": 13,
+//            "drwtNo2": 6,
+//            "drwtNo1": 5,
+//            "drwtNo6": 28,
+//            "drwtNo5": 27,
+//            "drwtNo4": 16,
+//            "drwNoDate": "2017-12-30",
+//            "drwNo": 787,
+//            "firstPrzwnerCo": 6
+//    }
 
     public int bnusNo;
-    public int firstAccumamnt;
-    public int firstWinamnt;
-    public String returnValue;
+    public long firstAccumamnt;
+    public long firstWinamnt;
+    public String returnValue = "";
     public long totSellamnt;
     public int drwtNo3;
     public int drwtNo2;
@@ -18,7 +33,7 @@ public class ResponseNumber {
     public int drwtNo6;
     public int drwtNo5;
     public int drwtNo4;
-    public String drwNoDate;
+    public String drwNoDate = "";
     public int drwNo;
     public int firstPrzwnerCo;
 

@@ -8,4 +8,5 @@ public interface ConnectionListener {
     void connectionSuccess(String result, String identifier);
     void connectionFail(String msg, String identifier);
     void connectionProgress(int progress, String identifier);
+    void connectionTaskFinish();
 }

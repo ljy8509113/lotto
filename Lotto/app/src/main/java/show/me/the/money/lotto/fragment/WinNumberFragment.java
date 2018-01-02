@@ -2,17 +2,20 @@ package show.me.the.money.lotto.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
+import show.me.the.money.lotto.LoadingView;
 import show.me.the.money.lotto.R;
 import show.me.the.money.lotto.data.DBManager;
 import show.me.the.money.lotto.data.DataNumber;
@@ -29,30 +32,36 @@ public class WinNumberFragment extends android.support.v4.app.Fragment implement
 
     ListView _listWinNumber;
     WinNumber _adapter;
-    ArrayList<ResponseNumber> _arrayData = new ArrayList<>();
+    ArrayList<DataNumber> _arrayData = new ArrayList<>();
     int _lastNoCount = 0;
+    int _currentCount = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState ){
-
         View view = inflater.inflate(R.layout.fragment_win_number, container, false);//(View) getLayoutInflater(). inflate(R.layout.fragment_win_number, null);
         _listWinNumber = (ListView) view.findViewById(R.id.list_win_number);
         _adapter = new WinNumber(_arrayData);
         _listWinNumber.setAdapter(_adapter);
 
-        _lastNoCount = DBManager.Instance(getContext()).getTotalCount();
-        if(_lastNoCount > 0){
-           DataNumber data = DBManager.Instance(getContext()).getData(_lastNoCount);
+        _currentCount = DBManager.Instance(getContext()).getTotalCount();
+        DataNumber data;
+        if(_currentCount > 0){
+           data = DBManager.Instance(getContext()).getData(_currentCount);
+           if(data != null){
+               _currentCount = data.no;
+           }
         }else{
-
+            _currentCount = 0;
         }
 
+        onLoad();
         return view;
     }
 
     public void onLoad(){
-        RequesterNumber num = new RequesterNumber("200");
-        ConnectionManager.Instance().send(this, num, "number");
+        LoadingView.Instance().show(getContext());
+        RequesterNumber number = new RequesterNumber("");
+        ConnectionManager.Instance().send(this, number,"lastNumber");
     }
 
     @Override
@@ -61,28 +70,51 @@ public class WinNumberFragment extends android.support.v4.app.Fragment implement
             Gson gson = new Gson();
             ResponseNumber num = gson.fromJson(result, ResponseNumber.class);
 
-            if (_arrayData.size() > 0) {
-                int lastNumber = _arrayData.get(_arrayData.size() - 1).drwNo;
-                if (num.drwNo > lastNumber)
-                    _arrayData.add(num);
-            } else {
-                _arrayData.add(num);
+            DataNumber data = new DataNumber();
+            data.setNumber(num);
+
+            DBManager.Instance(getContext()).insertData(data);
+
+            if(_currentCount < _lastNoCount){
+                _currentCount++;
+                RequesterNumber number = new RequesterNumber(_currentCount+"");
+                ConnectionManager.Instance().send(this, number,"number");
+            }else{
+                _arrayData = DBManager.Instance(getContext()).getAllData();
+                _adapter.updateData(_arrayData);
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        LoadingView.Instance().hide();
+                        _adapter.notifyDataSetChanged();
+                    }
+                });
             }
+        }else if(identifier.equals("lastNumber")){
+            Gson gson = new Gson();
+            ResponseNumber num = gson.fromJson(result, ResponseNumber.class);
+            _lastNoCount = num.drwNo;
 
-
-
-            _adapter.updateData(_arrayData);
-            getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-                    _adapter.notifyDataSetChanged();
-                }
-            });
+            if(_lastNoCount > _currentCount){
+                _currentCount ++;
+                RequesterNumber number = new RequesterNumber(_currentCount+"");
+                ConnectionManager.Instance().send(this, number,"number");
+            }else{
+                _arrayData = DBManager.Instance(getContext()).getAllData();
+                _adapter.updateData(_arrayData);
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        LoadingView.Instance().hide();
+                        _adapter.notifyDataSetChanged();
+                    }
+                });
+            }
         }
     }
 
     @Override
     public void connectionFail(String msg, String identifier) {
-
+        LoadingView.Instance().hide();
+        Toast.makeText(getContext(), "로딩 실패", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -90,11 +122,16 @@ public class WinNumberFragment extends android.support.v4.app.Fragment implement
 
     }
 
+    @Override
+    public void connectionTaskFinish() {
+
+    }
+
     public class WinNumber extends BaseAdapter{
         ViewHolder _viewHolder = null;
-        ArrayList<ResponseNumber> _array;
+        ArrayList<DataNumber> _array;
 
-        public WinNumber(ArrayList<ResponseNumber> array){
+        public WinNumber(ArrayList<DataNumber> array){
             _array = array;
         }
 
@@ -134,19 +171,19 @@ public class WinNumberFragment extends android.support.v4.app.Fragment implement
                 _viewHolder = (ViewHolder)v.getTag();
             }
 
-            _viewHolder.noText.setText(_array.get(i).drwNo + "");
-            _viewHolder.oneText.setText(_array.get(i).drwtNo1 + "");
-            _viewHolder.twoText.setText(_array.get(i).drwtNo2 + "");
-            _viewHolder.threeText.setText(_array.get(i).drwtNo3 + "");
-            _viewHolder.fourText.setText(_array.get(i).drwtNo4 + "");
-            _viewHolder.fiveText.setText(_array.get(i).drwtNo5 + "");
-            _viewHolder.sixText.setText(_array.get(i).drwtNo6 + "");
-            _viewHolder.bonusText.setText(_array.get(i).bnusNo + "");
+            _viewHolder.noText.setText(_array.get(i).no + "");
+            _viewHolder.oneText.setText(_array.get(i).arrayNumber[0] + "");
+            _viewHolder.twoText.setText(_array.get(i).arrayNumber[1] + "");
+            _viewHolder.threeText.setText(_array.get(i).arrayNumber[2] + "");
+            _viewHolder.fourText.setText(_array.get(i).arrayNumber[3] + "");
+            _viewHolder.fiveText.setText(_array.get(i).arrayNumber[4] + "");
+            _viewHolder.sixText.setText(_array.get(i).arrayNumber[5] + "");
+            _viewHolder.bonusText.setText(_array.get(i).bonus + "");
 
             return v;
         }
 
-        public void updateData(ArrayList<ResponseNumber> array){
+        public void updateData(ArrayList<DataNumber> array){
             _array = array;
         }
 
