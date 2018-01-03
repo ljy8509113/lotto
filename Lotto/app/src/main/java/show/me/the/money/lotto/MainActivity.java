@@ -17,6 +17,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
+import show.me.the.money.lotto.data.DataNumber;
 import show.me.the.money.lotto.fragment.NumberFragment;
 import show.me.the.money.lotto.fragment.WinNumberFragment;
 
@@ -27,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     ListView _listNumber;
 
     Fragment [] _arrayFragment = {new WinNumberFragment(), new NumberFragment()};
-
+    ArrayList<DataNumber> _arrayRandomAreaData = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +58,9 @@ public class MainActivity extends AppCompatActivity {
                         ((WinNumberFragment)_arrayFragment[position]).onLoad();
                         break;
                     case 1:
-
+                        if(_arrayRandomAreaData == null)
+                            _arrayRandomAreaData = ((WinNumberFragment)_arrayFragment[0]).getRandomDefaultData();
+                        ((NumberFragment)_arrayFragment[position]).setInit(_arrayRandomAreaData);
                         break;
                 }
 
@@ -115,32 +120,5 @@ public class MainActivity extends AppCompatActivity {
         public int getCount() {
             return tabCount;
         }
-    }
-}
-
-
-
-
-
-class NumberListViewAdapter extends BaseAdapter {
-
-    @Override
-    public int getCount() {
-        return 0;
-    }
-
-    @Override
-    public Object getItem(int i) {
-        return null;
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return 0;
-    }
-
-    @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        return null;
     }
 }

@@ -59,4 +59,10 @@
         android:text="00"
         android:textSize="20sp"
         android:textAlignment="center"/>
+
+    <Button
+        android:id="@+id/button_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="remove"/>
 </LinearLayout>

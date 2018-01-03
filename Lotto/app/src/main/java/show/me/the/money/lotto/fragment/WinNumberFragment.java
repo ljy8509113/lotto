@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
+import show.me.the.money.lotto.Common;
 import show.me.the.money.lotto.LoadingView;
 import show.me.the.money.lotto.R;
 import show.me.the.money.lotto.data.DBManager;
@@ -46,7 +47,7 @@ public class WinNumberFragment extends android.support.v4.app.Fragment implement
         _currentCount = DBManager.Instance(getContext()).getTotalCount();
         DataNumber data;
         if(_currentCount > 0){
-           data = DBManager.Instance(getContext()).getData(_currentCount);
+           data = DBManager.Instance(getContext()).getData(_currentCount, false);
            if(data != null){
                _currentCount = data.no;
            }
@@ -73,14 +74,14 @@ public class WinNumberFragment extends android.support.v4.app.Fragment implement
             DataNumber data = new DataNumber();
             data.setNumber(num);
 
-            DBManager.Instance(getContext()).insertData(data);
+            DBManager.Instance(getContext()).insertData(data, false);
 
             if(_currentCount < _lastNoCount){
                 _currentCount++;
                 RequesterNumber number = new RequesterNumber(_currentCount+"");
                 ConnectionManager.Instance().send(this, number,"number");
             }else{
-                _arrayData = DBManager.Instance(getContext()).getAllData();
+                _arrayData = DBManager.Instance(getContext()).getAllData(false);
                 _adapter.updateData(_arrayData);
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
@@ -99,7 +100,7 @@ public class WinNumberFragment extends android.support.v4.app.Fragment implement
                 RequesterNumber number = new RequesterNumber(_currentCount+"");
                 ConnectionManager.Instance().send(this, number,"number");
             }else{
-                _arrayData = DBManager.Instance(getContext()).getAllData();
+                _arrayData = DBManager.Instance(getContext()).getAllData(false);
                 _adapter.updateData(_arrayData);
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
@@ -125,6 +126,18 @@ public class WinNumberFragment extends android.support.v4.app.Fragment implement
     @Override
     public void connectionTaskFinish() {
 
+    }
+
+    public ArrayList<DataNumber> getRandomDefaultData(){
+        ArrayList<DataNumber> arrayRandomArea = new ArrayList<>();
+        for(int i=0; i<_arrayData.size(); i++){
+            if(i<= Common.RANDOM_AREA) {
+                arrayRandomArea.add(_arrayData.get(i));
+            }else{
+                break;
+            }
+        }
+        return arrayRandomArea;
     }
 
     public class WinNumber extends BaseAdapter{
